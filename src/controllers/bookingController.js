@@ -1,5 +1,17 @@
-const Booking = require('../models/Booking');
-const Category = require('../models/Category');
+const Booking = require("../models/Booking");
+const Category = require("../models/Category");
+
+// 🔹 Generate unique GRC number
+const generateGRC = async () => {
+  let grcNo,
+    exists = true;
+  while (exists) {
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    grcNo = `GRC-${rand}`;
+    exists = await Booking.findOne({ grcNo });
+  }
+  return grcNo;
+};
 
 // Book a room for a category (single or multiple)
 exports.bookRoom = async (req, res) => {
@@ -11,7 +23,10 @@ exports.bookRoom = async (req, res) => {
 
       // Find available rooms in this category
       const Room = require("../models/Room");
-      const availableRooms = await Room.find({ category: categoryId, status: 'available' }).limit(count);
+      const availableRooms = await Room.find({
+        category: categoryId,
+        status: "available",
+      }).limit(count);
       if (availableRooms.length < count) {
         throw new Error(`Not enough available rooms in ${category.name}`);
       }
@@ -19,8 +34,14 @@ exports.bookRoom = async (req, res) => {
       const bookedRoomNumbers = [];
       for (let i = 0; i < availableRooms.length; i++) {
         const room = availableRooms[i];
-        const referenceNumber = `REF-${Math.floor(100000 + Math.random() * 900000)}`;
+        const referenceNumber = `REF-${Math.floor(
+          100000 + Math.random() * 900000
+        )}`;
+        const grcNo = await generateGRC();
+        const reservationId = extraDetails.reservationId || null;
         const booking = new Booking({
+          grcNo,
+          reservationId,
           category: categoryId,
           roomNumber: room.room_number,
           isActive: true,
@@ -30,11 +51,11 @@ exports.bookRoom = async (req, res) => {
           contactDetails: extraDetails.contactDetails,
           identityDetails: extraDetails.identityDetails,
           bookingInfo: extraDetails.bookingInfo,
-          paymentDetails: extraDetails.paymentDetails
+          paymentDetails: extraDetails.paymentDetails,
         });
         await booking.save();
         // Set Room.status to 'booked'
-        room.status = 'booked';
+        room.status = "booked";
         await room.save();
         bookedRoomNumbers.push(room.room_number);
       }
@@ -42,7 +63,7 @@ exports.bookRoom = async (req, res) => {
       // Return all booked room records
       const bookings = await Booking.find({
         roomNumber: { $in: bookedRoomNumbers },
-        category: categoryId
+        category: categoryId,
       });
       return bookings;
     };
@@ -68,10 +89,11 @@ exports.bookRoom = async (req, res) => {
       contactDetails,
       identityDetails,
       bookingInfo,
-      paymentDetails
+      paymentDetails,
     } = req.body;
 
-    if (!categoryId) return res.status(400).json({ error: 'categoryId is required' });
+    if (!categoryId)
+      return res.status(400).json({ error: "categoryId is required" });
 
     const numRooms = count && Number.isInteger(count) && count > 0 ? count : 1;
 
@@ -80,11 +102,10 @@ exports.bookRoom = async (req, res) => {
       contactDetails,
       identityDetails,
       bookingInfo,
-      paymentDetails
+      paymentDetails,
     });
 
     return res.status(201).json({ success: true, booked: bookings });
-
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -93,8 +114,8 @@ exports.bookRoom = async (req, res) => {
 // 🔹 Get all bookings
 exports.getBookings = async (req, res) => {
   try {
-    const filter = req.query.all === 'true' ? {} : { isActive: true };
-    const bookings = await Booking.find(filter).populate('category');
+    const filter = req.query.all === "true" ? {} : { isActive: true };
+    const bookings = await Booking.find(filter).populate("category");
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -105,7 +126,9 @@ exports.getBookings = async (req, res) => {
 exports.getBookingsByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
-    const bookings = await Booking.find({ category: categoryId }).populate('category');
+    const bookings = await Booking.find({ category: categoryId }).populate(
+      "category"
+    );
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -117,10 +140,10 @@ exports.deleteBooking = async (req, res) => {
   try {
     const { bookingId } = req.params;
     const booking = await Booking.findById(bookingId);
-    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
 
     if (!booking.isActive) {
-      return res.status(400).json({ error: 'Booking already inactive' });
+      return res.status(400).json({ error: "Booking already inactive" });
     }
 
     booking.isActive = false;
@@ -130,10 +153,10 @@ exports.deleteBooking = async (req, res) => {
     const Room = require("../models/Room");
     await Room.findOneAndUpdate(
       { category: booking.category, room_number: String(booking.roomNumber) },
-      { status: 'available' }
+      { status: "available" }
     );
 
-    res.json({ success: true, message: 'Booking unbooked (marked inactive)' });
+    res.json({ success: true, message: "Booking unbooked (marked inactive)" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -144,9 +167,9 @@ exports.permanentlyDeleteBooking = async (req, res) => {
   try {
     const { bookingId } = req.params;
     const deleted = await Booking.findByIdAndDelete(bookingId);
-    if (!deleted) return res.status(404).json({ error: 'Booking not found' });
+    if (!deleted) return res.status(404).json({ error: "Booking not found" });
 
-    res.json({ success: true, message: 'Booking permanently deleted' });
+    res.json({ success: true, message: "Booking permanently deleted" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -157,14 +180,19 @@ exports.updateBooking = async (req, res) => {
   try {
     const { bookingId } = req.params;
     const updates = req.body;
-    
+
     // Fields that cannot be updated directly
-    const restrictedFields = ['isActive', 'referenceNumber', 'createdAt', '_id'];
-    restrictedFields.forEach(field => delete updates[field]);
-    
+    const restrictedFields = [
+      "isActive",
+      "referenceNumber",
+      "createdAt",
+      "_id",
+    ];
+    restrictedFields.forEach((field) => delete updates[field]);
+
     const booking = await Booking.findById(bookingId);
-    if (!booking) return res.status(404).json({ error: 'Booking not found' });
-    
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
+
     // Update allowed fields safely
     if (updates.guestDetails) {
       if (!booking.guestDetails) booking.guestDetails = {};
@@ -201,20 +229,21 @@ exports.updateBooking = async (req, res) => {
         reason: updates.reason,
         additionalAmount: updates.additionalAmount,
         paymentMode: updates.paymentMode,
-        approvedBy: updates.approvedBy
+        approvedBy: updates.approvedBy,
       });
       booking.bookingInfo.checkOut = new Date(updates.extendedCheckOut);
       if (updates.additionalAmount) {
-        booking.paymentDetails.totalAmount = (booking.paymentDetails.totalAmount || 0) + updates.additionalAmount;
+        booking.paymentDetails.totalAmount =
+          (booking.paymentDetails.totalAmount || 0) + updates.additionalAmount;
       }
     }
 
     await booking.save();
-    
+
     res.json({
       success: true,
-      message: 'Booking updated successfully',
-      booking
+      message: "Booking updated successfully",
+      booking,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -225,15 +254,21 @@ exports.updateBooking = async (req, res) => {
 exports.extendBooking = async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const { extendedCheckOut, reason, additionalAmount, paymentMode, approvedBy } = req.body;
-    
+    const {
+      extendedCheckOut,
+      reason,
+      additionalAmount,
+      paymentMode,
+      approvedBy,
+    } = req.body;
+
     const booking = await Booking.findById(bookingId);
-    if (!booking) return res.status(404).json({ error: 'Booking not found' });
-    
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
+
     if (!booking.isActive) {
-      return res.status(400).json({ error: 'Cannot extend inactive booking' });
+      return res.status(400).json({ error: "Cannot extend inactive booking" });
     }
-    
+
     // Save original check-in and checkout date
     const originalCheckIn = booking.bookingInfo.checkIn;
     const originalCheckOut = booking.bookingInfo.checkOut;
@@ -246,24 +281,24 @@ exports.extendBooking = async (req, res) => {
       reason,
       additionalAmount,
       paymentMode,
-      approvedBy
+      approvedBy,
     });
-    
+
     // Update checkout date
     booking.bookingInfo.checkOut = new Date(extendedCheckOut);
-    
+
     // Update payment if provided
     if (additionalAmount) {
-      booking.paymentDetails.totalAmount = 
+      booking.paymentDetails.totalAmount =
         (booking.paymentDetails.totalAmount || 0) + additionalAmount;
     }
-    
+
     await booking.save();
-    
-    res.json({ 
-      success: true, 
-      message: 'Booking extended successfully',
-      booking
+
+    res.json({
+      success: true,
+      message: "Booking extended successfully",
+      booking,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
