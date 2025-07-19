@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
   // 🔹 Core Booking Info
+  grcNo: { type: String, unique: true, required: true },  // Guest Registration Card No
+  reservationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Reservation', default: null },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
@@ -47,7 +49,8 @@ const bookingSchema = new mongoose.Schema({
     },
     idNumber: String,
     idPhotoFront: String, // Cloudinary URL
-    idPhotoBack: String
+    idPhotoBack: String,
+    photoUrl:String,
   },
 
   // 🔹 Booking Details
