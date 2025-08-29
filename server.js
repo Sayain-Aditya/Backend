@@ -33,8 +33,12 @@ const checkoutRoutes = require('./src/routes/checkoutRoutes.js');
 
 const paymentRoutes = require('./src/routes/paymentRoutes.js');
 const restaurantReservationRoutes = require('./src/routes/restaurantReservationRoutes');
-const banquetMenuRoutes = require('./src/routes/banquetMenuRoutes.js');
-const banquetBookingRoutes = require('./src/routes/banquetBookingRoutes.js');
+// const banquetMenuRoutes = require('./src/routes/banquetMenuRoutes.js');
+// const banquetBookingRoutes = require('./src/routes/banquetBookingRoutes.js');
+const menuItemRoutes = require('./src/routes/menuItemRoutes.js');
+const menuCategoryRoutes = require('./src/routes/menuCategoryRoutes.js');
+const menuRatePlanRoutes = require('./src/routes/menuRatePlanRoutes.js');
+const menuLimitRoutes = require('./src/routes/menuLimitRoutes.js');
 const path = require('path');
 // Initialize express app
 const app = express();
@@ -114,8 +118,12 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/restaurant-reservations', restaurantReservationRoutes);
 
 app.use('/api/payments', paymentRoutes);
-app.use('/api/banquet-menus', banquetMenuRoutes);
-app.use('/api/banquet-bookings', banquetBookingRoutes);
+// app.use('/api/banquet-menus', banquetMenuRoutes);
+// app.use('/api/banquet-bookings', banquetBookingRoutes);
+app.use('/api/menuitems', menuItemRoutes);
+app.use('/api/menucategories', menuCategoryRoutes);
+app.use('/api/menurateplans', menuRatePlanRoutes);
+app.use('/api/menulimits', menuLimitRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
