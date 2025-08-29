@@ -8,7 +8,7 @@ const MenuItemSchema = new mongoose.Schema({
     required: true
   },
   type: { type: String, enum: ["Veg", "NonVeg"], required: true }, 
-  price: { type: Number, default: 0 },           // optional (if standalone order)
+  //price: { type: Number, default: 0 },           // optional (if standalone order)
   isActive: { type: Boolean, default: true }     // show/hide in menu
 }, { timestamps: true });
 
