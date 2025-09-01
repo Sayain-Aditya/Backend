@@ -14,8 +14,8 @@ router.post("/create", createBooking);
 router.get("/", getBookings);
 router.get("/pg", getAllPagination);
 router.get('/search',searchBooking)
-router.get("/:id", getBookingById);
-router.delete("/:id", deleteBooking);
-router.put("/:id", updateBooking);
+router.get("/get/:id", getBookingById);
+router.delete("/delete/:id", deleteBooking);
+router.put("/update/:id", updateBooking);
 
 module.exports = router;
