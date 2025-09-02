@@ -8,7 +8,7 @@ const {
   initializeDefaults
 } = require("../controllers/planLimitController");
 
-router.get("/create", getAllPlanLimits);
+router.get("/get", getAllPlanLimits);
 router.get("/formatted", getFormattedLimits);
 router.get("/:ratePlan/:foodType", getPlanLimit);
 router.post("/", upsertPlanLimit);
