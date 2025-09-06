@@ -1,4 +1,4 @@
-const Booking = require("../models/banquetBooking");
+const BanquetBooking = require("../models/banquetBooking");
 const Menu = require("../models/BanquetMenu");
 const generateCustomerRef = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -38,7 +38,7 @@ exports.createBooking = async (req, res) => {
     bookingData.customerRef = customerRef;
 
     // 1. Create booking
-    const booking = await Booking.create(bookingData);
+    const booking = await BanquetBooking.create(bookingData);
     console.log("Booking created:", booking);
 console.log("Menu",req.body.categorizedMenu)
     // 2. Handle categorizedMenu
@@ -81,7 +81,7 @@ console.log("Menu",req.body.categorizedMenu)
 // @desc    Get all bookings
 exports.getBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find().sort({ createdAt: -1 });
+    const bookings = await BanquetBooking.find().sort({ createdAt: -1 });
     res.status(200).json(bookings);
   } catch (err) {
     console.error("Error fetching bookings:", err.message);
@@ -95,7 +95,7 @@ exports.getBookings = async (req, res) => {
 // @desc    Get a single booking by ID
 exports.getBookingById = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await BanquetBooking.findById(req.params.id);
 
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
@@ -173,7 +173,7 @@ exports.updateBooking = async (req, res) => {
     }
 
     // 1. Find the booking
-    const booking = await Booking.findById(req.params.id);
+    const booking = await BanquetBooking.findById(req.params.id);
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
@@ -255,7 +255,7 @@ exports.updateBooking = async (req, res) => {
 // @desc    Delete a booking by ID
 exports.deleteBooking = async (req, res) => {
   try {
-    const deletedBooking = await Booking.findByIdAndDelete(req.params.id);
+    const deletedBooking = await BanquetBooking.findByIdAndDelete(req.params.id);
 
     if (!deletedBooking) {
       return res.status(404).json({ message: "Booking not found" });
@@ -281,7 +281,7 @@ exports.getAllPagination = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Fetch bookings with pagination and sorting
-    const bookings = await Booking.find()
+    const bookings = await BanquetBooking.find()
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });  // Most recent bookings first
@@ -290,7 +290,7 @@ exports.getAllPagination = async (req, res) => {
       return res.status(404).json({ message: 'No bookings found' });
     }
 
-    const totalCount = await Booking.countDocuments();
+    const totalCount = await BanquetBooking.countDocuments();
 
     res.status(200).json({
       message: 'Bookings fetched successfully',
@@ -317,7 +317,7 @@ exports.searchBooking = async (req, res) => {
   }
 
   try {
-    const bookings = await Booking.find({
+    const bookings = await BanquetBooking.find({
       $or: [
         { name: { $regex: query, $options: "i" } },
         { phone: { $regex: query, $options: "i" } },
