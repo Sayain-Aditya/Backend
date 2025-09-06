@@ -8,6 +8,7 @@ const banquetbookingSchema = new mongoose.Schema({
   pax: { type: Number, },
   startDate: { type: Date, },
  gst:{type:Number},
+ grcNo: { type: String, sparse: true }, // GRC number, sparse allows multiple null values
 
   ratePlan: { type: String, },
   advance: { type: Number, default: 0 },
@@ -69,7 +70,8 @@ status:String,
 changedAt:Date
  }],
 }, {
-  timestamps: true // Automatically adds createdAt and updatedAt
+  timestamps: true, // Automatically adds createdAt and updatedAt
+  collection: 'banquetbookings' // Specify collection name
 });
 
 module.exports = mongoose.model("BanquetBooking", banquetbookingSchema);
