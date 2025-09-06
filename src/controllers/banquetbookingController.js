@@ -19,11 +19,26 @@ exports.createBooking = async (req, res) => {
       refExists = await Menu.exists({ customerRef });
     }
 
-    // Attach to the request body
-    req.body.customerRef = customerRef;
+    // Convert string numbers to actual numbers
+    const bookingData = { ...req.body };
+    if (bookingData.pax) bookingData.pax = Number(bookingData.pax);
+    if (bookingData.advance) bookingData.advance = Number(bookingData.advance);
+    if (bookingData.total) bookingData.total = Number(bookingData.total);
+    if (bookingData.balance) bookingData.balance = Number(bookingData.balance);
+    if (bookingData.ratePerPax) bookingData.ratePerPax = Number(bookingData.ratePerPax);
+    if (bookingData.discount) bookingData.discount = Number(bookingData.discount);
+    if (bookingData.gst) bookingData.gst = Number(bookingData.gst);
+    if (bookingData.extraRooms) bookingData.extraRooms = Number(bookingData.extraRooms);
+    if (bookingData.roomPricePerUnit) bookingData.roomPricePerUnit = Number(bookingData.roomPricePerUnit);
+    if (bookingData.extraRoomTotalPrice) bookingData.extraRoomTotalPrice = Number(bookingData.extraRoomTotalPrice);
+    if (bookingData.complimentaryRooms) bookingData.complimentaryRooms = Number(bookingData.complimentaryRooms);
+    if (bookingData.staffEditCount) bookingData.staffEditCount = Number(bookingData.staffEditCount);
+
+    // Attach customerRef
+    bookingData.customerRef = customerRef;
 
     // 1. Create booking
-    const booking = await Booking.create(req.body);
+    const booking = await Booking.create(bookingData);
     console.log("Booking created:", booking);
 console.log("Menu",req.body.categorizedMenu)
     // 2. Handle categorizedMenu
