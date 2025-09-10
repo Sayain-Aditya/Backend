@@ -69,7 +69,8 @@ status:String,
 changedAt:Date
  }],
 }, {
-  timestamps: true // Automatically adds createdAt and updatedAt
+  timestamps: true, // Automatically adds createdAt and updatedAt
+  collection: 'banquetbookings' // Specify collection name
 });
 
 module.exports = mongoose.model("BanquetBooking", banquetbookingSchema);
