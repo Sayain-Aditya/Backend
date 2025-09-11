@@ -1,28 +1,9 @@
 const PlanLimit = require("../models/PlanLimit");
-const BanquetCategory = require("../models/banquetCategory");
-const mongoose = require("mongoose");
 
 // Get all plan limits
 exports.getAllPlanLimits = async (req, res) => {
   try {
-    const limits = await PlanLimit.find().sort({ ratePlan: 1, foodType: 1 }).lean();
-    
-    // Convert ObjectId keys to category names
-    for (let limit of limits) {
-      if (limit.limits && typeof limit.limits === 'object') {
-        const newLimits = {};
-        for (let [key, value] of Object.entries(limit.limits)) {
-          if (mongoose.Types.ObjectId.isValid(key)) {
-            const category = await BanquetCategory.findById(key);
-            newLimits[category?.cateName || key] = value;
-          } else {
-            newLimits[key] = value;
-          }
-        }
-        limit.limits = newLimits;
-      }
-    }
-    
+    const limits = await PlanLimit.find().sort({ ratePlan: 1, foodType: 1 });
     res.json({ success: true, data: limits });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
