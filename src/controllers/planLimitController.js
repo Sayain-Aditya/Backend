@@ -13,16 +13,12 @@ exports.getAllPlanLimits = async (req, res) => {
       categoryMap[cat._id.toString()] = cat.cateName;
     });
     
-    console.log('Category Map:', categoryMap);
-    
     // Convert ObjectId keys to category names
     for (let limit of limits) {
       if (limit.limits && typeof limit.limits === 'object') {
         const newLimits = {};
         for (let [key, value] of Object.entries(limit.limits)) {
-          console.log('Processing key:', key, 'Value:', value);
           const categoryName = categoryMap[key.toString()] || `Unknown_${key}`;
-          console.log('Mapped to:', categoryName);
           newLimits[categoryName] = value;
         }
         limit.limits = newLimits;
