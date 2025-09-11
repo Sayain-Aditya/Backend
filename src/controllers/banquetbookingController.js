@@ -43,18 +43,8 @@ exports.createBooking = async (req, res) => {
 console.log("Menu",req.body.categorizedMenu)
     // 2. Handle categorizedMenu
     if (req.body.categorizedMenu) {
-      const validCategories = Object.keys(Menu.schema.paths)
-        .filter(key => !['_id', '__v', 'createdAt', 'updatedAt', 'bookingRef','customerRef'].includes(key));
-      
-      const cleanedMenu = {};
-      validCategories.forEach(cat => {
-        cleanedMenu[cat] = Array.isArray(req.body.categorizedMenu[cat]) 
-          ? req.body.categorizedMenu[cat] 
-          : [];
-      });
-
       const menu = new Menu({
-        ...cleanedMenu,
+        categories: req.body.categorizedMenu,
         bookingRef: booking._id,
         customerRef: customerRef
       });
@@ -214,24 +204,14 @@ exports.updateBooking = async (req, res) => {
 
     // --- MENU UPDATE LOGIC ---
     if (updatedData.categorizedMenu && booking.customerRef) {
-      const validCategories = Object.keys(Menu.schema.paths)
-        .filter(key => !['_id', '__v', 'createdAt', 'updatedAt', 'bookingRef','customerRef'].includes(key));
-      const cleanedMenu = {};
-      validCategories.forEach(cat => {
-        cleanedMenu[cat] = Array.isArray(updatedData.categorizedMenu[cat]) 
-          ? updatedData.categorizedMenu[cat] 
-          : [];
-      });
       let menu = await Menu.findOne({ bookingRef: booking._id });
       if (menu) {
-        validCategories.forEach(cat => {
-          menu[cat] = cleanedMenu[cat];
-        });
+        menu.categories = updatedData.categorizedMenu;
         menu.customerRef = booking.customerRef;
         await menu.save();
       } else {
         menu = new Menu({
-          ...cleanedMenu,
+          categories: updatedData.categorizedMenu,
           bookingRef: booking._id,
           customerRef: booking.customerRef
         });
