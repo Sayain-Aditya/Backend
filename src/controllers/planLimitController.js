@@ -1,9 +1,30 @@
 const PlanLimit = require("../models/PlanLimit");
+const BanquetCategory = require("../models/banquetCategory");
 
 // Get all plan limits
 exports.getAllPlanLimits = async (req, res) => {
   try {
-    const limits = await PlanLimit.find().sort({ ratePlan: 1, foodType: 1 });
+    const limits = await PlanLimit.find().sort({ ratePlan: 1, foodType: 1 }).lean();
+    
+    // Get all categories
+    const categories = await BanquetCategory.find().lean();
+    const categoryMap = {};
+    categories.forEach(cat => {
+      categoryMap[cat._id.toString()] = cat.cateName;
+    });
+    
+    // Convert ObjectId keys to category names
+    for (let limit of limits) {
+      if (limit.limits && typeof limit.limits === 'object') {
+        const newLimits = {};
+        for (let [key, value] of Object.entries(limit.limits)) {
+          const categoryName = categoryMap[key] || key;
+          newLimits[categoryName] = value;
+        }
+        limit.limits = newLimits;
+      }
+    }
+    
     res.json({ success: true, data: limits });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
