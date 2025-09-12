@@ -87,12 +87,14 @@ exports.getMenuByFoodType = async (req, res) => {
     const { foodType } = req.params;
     
     // Handle both 'foodType' and 'type' fields, and both 'Veg'/'NonVeg' and 'Non-Veg' values
-    const typeQuery = foodType === 'Non-Veg' ? ['NonVeg', 'Non-Veg', 'Both'] : ['Veg', 'Both'];
+    const normalizedFoodType = foodType.toLowerCase();
+    const typeQuery = normalizedFoodType.includes('non') ? ['NonVeg', 'Non-Veg', 'Both'] : ['Veg', 'Both'];
     
     const items = await MenuItem.find({
+      isActive: true,
       $or: [
-        { foodType: { $in: typeQuery }, isActive: true },
-        { type: { $in: typeQuery }, isActive: true }
+        { foodType: { $in: typeQuery } },
+        { type: { $in: typeQuery } }
       ]
     }).populate('category').sort({ category: 1, name: 1 });
     
@@ -101,10 +103,11 @@ exports.getMenuByFoodType = async (req, res) => {
       let categoryName;
       if (typeof item.category === 'string') {
         categoryName = item.category;
+      } else if (item.category?.cateName) {
+        categoryName = item.category.cateName;
       } else if (item.category?.name) {
         categoryName = item.category.name;
       } else {
-        // If it's an ObjectId, convert to string and use as category name
         categoryName = item.category?.toString() || 'UNCATEGORIZED';
       }
       
@@ -115,7 +118,6 @@ exports.getMenuByFoodType = async (req, res) => {
     
     res.json({ success: true, data: groupedMenu });
   } catch (error) {
-
     res.status(500).json({ success: false, message: error.message });
   }
 };
