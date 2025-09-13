@@ -45,7 +45,7 @@ const calculateItems = async (items) => {
 // 🔹 Create Laundry Order
 exports.createLaundryOrder = async (req, res) => {
   try {
-    const { bookingId, items, urgent } = req.body;
+    const { bookingId, items, urgent, grcNo, roomNumber, requestedByName, receivedBy } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Items are required" });
@@ -71,16 +71,19 @@ exports.createLaundryOrder = async (req, res) => {
       });
     }
 
-    // Save Laundry order
+    // ✅ Save Laundry order with extra fields
     const laundryOrder = await Laundry.create({
       bookingId,
+      grcNo,
+      roomNumber,
+      requestedByName,
       items: laundryItems,
       totalAmount,
-      urgent: urgent || false,
+      isUrgent: urgent || false, // ⚡ field ka naam match karo model se
       billStatus: "unpaid",
     });
 
-    // ✅ Create Invoice (just like Housekeeping flow)
+    // ✅ Create Invoice
     const invoiceNumber = await generateInvoiceNumber();
     const invoiceItems = laundryItems.map(i => ({
       description: `${i.itemName} x ${i.quantity}`,
