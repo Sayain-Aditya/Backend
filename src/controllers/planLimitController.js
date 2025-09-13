@@ -1,4 +1,5 @@
 const PlanLimit = require("../models/PlanLimit");
+const BanquetCategory = require("../models/banquetCategory");
 
 // Get all plan limits
 exports.getAllPlanLimits = async (req, res) => {
@@ -31,9 +32,22 @@ exports.upsertPlanLimit = async (req, res) => {
   try {
     const { ratePlan, foodType, limits } = req.body;
     
+    // Convert ObjectId keys to category names before saving
+    const categories = await BanquetCategory.find().lean();
+    const categoryMap = {};
+    categories.forEach(cat => {
+      categoryMap[cat._id.toString()] = cat.cateName;
+    });
+    
+    const convertedLimits = {};
+    for (let [key, value] of Object.entries(limits)) {
+      const categoryName = categoryMap[key] || key;
+      convertedLimits[categoryName] = value;
+    }
+    
     const planLimit = await PlanLimit.findOneAndUpdate(
       { ratePlan, foodType },
-      { ratePlan, foodType, limits },
+      { ratePlan, foodType, limits: convertedLimits },
       { new: true, upsert: true }
     );
     
