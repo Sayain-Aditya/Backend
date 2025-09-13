@@ -26,6 +26,9 @@ router.patch("/add-items/:id", laundryController.addItemsToLaundryOrder);
 // upd item route 
 router.patch("/item/:laundryId/:itemId", laundryController.updateLaundryItemStatus);
 
+// ✅ Update overall laundry order status
+router.patch("/status/:id", laundryController.updateLaundryStatus);
+
 // Cancel laundry order
 router.patch("/cancel/:id", laundryController.cancelLaundryOrder);
 
