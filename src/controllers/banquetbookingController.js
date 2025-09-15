@@ -49,6 +49,7 @@ console.log("Menu",req.body.categorizedMenu)
         customerRef: customerRef
       });
       await menu.save();
+      console.log('Menu created with bookingRef:', booking._id);
     }
 
     res.status(201).json({ message: "Success", booking });
