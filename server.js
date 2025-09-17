@@ -48,7 +48,7 @@ const allowedOrigins = [
   "https://backend-hazel-xi.vercel.app",
   "https://buddha-crm.vercel.app",
   "https://buddha-admin.vercel.app",
-  "https://budhha-admincrm-tuny.vercel.app",
+  "https://budhha-admincrm-4qt5.vercel.app",
 ];
 app.use(
   cors({
