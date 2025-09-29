@@ -40,10 +40,10 @@ const menuItemRoutes = require('./src/routes/menuItemRoutes.js');
 const banquetCategoryRoutes = require('./src/routes/banquetCategoryRoutes.js');
 const dashboardRoutes = require('./src/routes/dashboardRoutes.js');
 const cashTransactionRoutes = require('./src/routes/cashTransactionRoutes.js');
-const wastageRoutes = require('./src/routes/wastageRoutes.js');
 const attendanceRoutes = require('./src/routes/attendanceRoutes.js');
 const payrollRoutes = require('./src/routes/payrollRoutes.js');
 const staffRoutes = require('./src/routes/staffRoutes.js');
+const wastageRoutes = require('./src/routes/wastageRoutes.js');
 const path = require('path');
 // Initialize express app
 const app = express();
