@@ -38,6 +38,11 @@ const banquetBookingRoutes = require('./src/routes/banquetBookingRoutes.js');
 const planLimitRoutes = require('./src/routes/planLimitRoutes.js');
 const menuItemRoutes = require('./src/routes/menuItemRoutes.js');
 const banquetCategoryRoutes = require('./src/routes/banquetCategoryRoutes.js');
+const dashboardRoutes = require('./src/routes/dashboardRoutes.js');
+const cashTransactionRoutes = require('./src/routes/cashTransactionRoutes.js');
+const attendanceRoutes = require('./src/routes/attendanceRoutes.js');
+const payrollRoutes = require('./src/routes/payrollRoutes.js');
+const staffRoutes = require('./src/routes/staffRoutes.js');
 const wastageRoutes = require('./src/routes/wastageRoutes.js');
 const path = require('path');
 // Initialize express app
@@ -124,7 +129,12 @@ app.use('/api/banquet-bookings', banquetBookingRoutes);
 app.use('/api/plan-limits', planLimitRoutes);
 app.use('/api/menu-items', menuItemRoutes);
 app.use('/api/banquet-categories', banquetCategoryRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/cash-transactions', cashTransactionRoutes);
 app.use('/api/wastage', wastageRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/payroll', payrollRoutes);
+app.use('/api/staff', staffRoutes);
 
 
 // Health check endpoint
