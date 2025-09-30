@@ -1,72 +1,63 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const cabBookingSchema = new mongoose.Schema({
-  purpose: {
+  customerName: {
     type: String,
-    enum: ['guest_transport', 'hotel_supply', 'staff_pickup', 'sightseeing', 'other'],
-    default: 'guest_transport', 
-    //required: true,
+    required: true,
+    trim: true
   },
-
-  // Guest or Room Info (only relevant if purpose = guest_transport or sightseeing)
-  guestName: String,
-  roomNumber: String,
-  grcNo: String, // Optional guest linkage
-  guestType: {
+  customerPhone: {
     type: String,
-    enum: ['inhouse', 'external'],
-    default: 'inhouse',
+    required: true,
+    trim: true
   },
-  bookingId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Booking'
-  },  
-  // Ride Details
   pickupLocation: {
     type: String,
     required: true,
+    trim: true
   },
-  destination: {
+  dropLocation: {
     type: String,
     required: true,
+    trim: true
   },
   pickupTime: {
     type: Date,
-    required: true,
+    required: true
   },
-  cabType: {
+  vehicleType: {
     type: String,
-    enum: ['standard', 'premium', 'suv'],
-    default: 'standard',
+    enum: ["sedan", "suv", "hatchback", "luxury"],
+    default: "sedan"
   },
-  specialInstructions: String,
-  scheduled: {
-    type: Boolean,
-    default: false, 
+  fare: {
+    type: Number,
+    required: true,
+    min: 0
   },
-
-  // Cab Vehicle & Driver Info
-  vehicleId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Vehicle',
-  },
-  vehicleNumber: String,
-   // ➤ Reference to Driver
-   driverId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Driver",
-  },
-  driverName: { type: String, trim: true },     //  Snapshot
-
-  // Status Tracking
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'on_route', 'completed', 'cancelled'],
-    default: 'pending',
+    enum: ["pending", "confirmed", "on_route", "completed", "cancelled"],
+    default: "pending"
   },
-  cancellationReason: String,
+  driverName: {
+    type: String,
+    trim: true
+  },
+  driverPhone: {
+    type: String,
+    trim: true
+  },
+  vehicleNumber: {
+    type: String,
+    trim: true
+  },
+  notes: {
+    type: String,
+    trim: true
+  }
 }, {
-  timestamps: true  
+  timestamps: true
 });
 
-module.exports = mongoose.models.CabBooking || mongoose.model("CabBooking", cabBookingSchema);
+module.exports = mongoose.model("CabBooking", cabBookingSchema);
