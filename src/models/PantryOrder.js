@@ -6,14 +6,6 @@ const PantryOrderSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  roomNumber: {
-    type: String,
-    required: true
-  },
-  guestName: {
-    type: String,
-    required: true
-  },
   items: [{
     itemId: {
       type: mongoose.Schema.Types.ObjectId,
